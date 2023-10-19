@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 
 const routes = require("./routes");
 
+const helmet = require("helmet");
+
 const { PORT = 3001 } = process.env;
 const app = express();
 
@@ -22,6 +24,8 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+app.use(helmet());
 
 app.use(routes);
 
