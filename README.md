@@ -11,5 +11,5 @@ This project is meant to create the back end project for the WTWR applicataion. 
 
 ## Run the project
 
-Use npm run start -- to launch the server
-Use npm run dev -- to launch the server but with the hot reload feature
+Use `npm run start` — to launch the server.
+Use `npm run dev` — to launch the server but with the hot reload feature
