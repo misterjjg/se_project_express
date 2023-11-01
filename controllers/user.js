@@ -2,21 +2,26 @@ const User = require("../models/user");
 const handleError = require("../utils/config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../utils/constants");
 
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar })
-    .then((user) => {
-      res.status(200).send({ user });
-    })
-    .catch((err) => {
-      handleError(req, res, err);
-    });
+  bcrypt.hash(password, 10).then((hash) =>
+    User.create({ name, avatar, email, password: hash })
+      .then((user) => {
+        const userData = user.toObject();
+        delete userData.password;
+        res.status(200).send({ userData });
+      })
+      .catch((err) => {
+        handleError(req, res, err);
+      }),
+  );
 };
 
-const getUser = (req, res) => {
-  const { userId } = req.params;
+const getCurrentUser = (req, res) => {
+  const userId = req.user._id;
   User.findById(userId)
     .orFail()
     .then((user) => {
@@ -37,4 +42,39 @@ const getUsers = (req, res) => {
     });
 };
 
-module.exports = { createUser, getUsers, getUser };
+const updateCurrentUser = (req, res) => {
+  const { name, avatar } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    { new: true, runValidators: true },
+  )
+    .orFail()
+    .then((user) => {
+      res.status(200).send({ user });
+    })
+    .catch((err) => {
+      handleError(req, res, err);
+    });
+};
+
+const logIn = (req, res) => {
+  User.findUserByCredentials(req.body.email, req.body.password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      handleError(req, res, err);
+    });
+};
+
+module.exports = {
+  createUser,
+  getUsers,
+  getCurrentUser,
+  logIn,
+  updateCurrentUser,
+};

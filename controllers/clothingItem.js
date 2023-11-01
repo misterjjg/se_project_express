@@ -72,14 +72,4 @@ const deleteItem = (req, res) => {
     });
 };
 
-//   ClothingItem.findByIdAndDelete(itemId)
-//     .orFail()
-//     .then((item) => {
-//       res.status(200).send({ item });
-//     })
-//     .catch((err) => {
-//       handleError(req, res, err);
-//     });
-// };
-
 module.exports = { createItem, getItems, likeItem, dislikeItem, deleteItem };
