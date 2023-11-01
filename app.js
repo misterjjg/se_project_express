@@ -2,6 +2,9 @@ const express = require("express");
 
 const mongoose = require("mongoose");
 
+const cors = require("cors");
+require("dotenv").config();
+
 const helmet = require("helmet");
 
 const routes = require("./routes");
@@ -26,6 +29,8 @@ app.use((req, res, next) => {
 });
 
 app.use(helmet());
+
+app.use(cors());
 
 app.use(routes);
 
