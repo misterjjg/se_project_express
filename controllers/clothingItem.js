@@ -57,14 +57,29 @@ const dislikeItem = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
-      res.status(200).send({ item });
+      if (String(item.owner) !== req.user._id) {
+        return Promise.reject(new Error("Cannot delete another user's item"));
+      }
+      ClothingItem.findByIdAndDelete(item._id).then(() => {
+        res.status(200).send({ message: "Item deleted" });
+      });
     })
     .catch((err) => {
       handleError(req, res, err);
     });
 };
+
+//   ClothingItem.findByIdAndDelete(itemId)
+//     .orFail()
+//     .then((item) => {
+//       res.status(200).send({ item });
+//     })
+//     .catch((err) => {
+//       handleError(req, res, err);
+//     });
+// };
 
 module.exports = { createItem, getItems, likeItem, dislikeItem, deleteItem };
