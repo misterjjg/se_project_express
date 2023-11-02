@@ -59,7 +59,9 @@ const updateCurrentUser = (req, res) => {
 };
 
 const logIn = (req, res) => {
-  User.findUserByCredentials(req.body.email, req.body.password)
+  User.findUserByCredentials(req.body.email, req.body.password);
+  console
+    .log({ JWT_SECRET })
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",

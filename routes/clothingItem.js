@@ -9,13 +9,13 @@ const {
   deleteItem,
 } = require("../controllers/clothingItem");
 
-// Create
-router.post("/", createItem);
-
 // Read
 router.get("/", getItems);
 
 router.use(auth);
+
+// Create
+router.post("/", createItem);
 
 // Update
 router.put("/:itemId/likes", likeItem);
