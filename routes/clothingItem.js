@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const auth = require("../middlewares/auth");
 
 const {
   createItem,
@@ -13,6 +14,8 @@ router.post("/", createItem);
 
 // Read
 router.get("/", getItems);
+
+router.use(auth);
 
 // Update
 router.put("/:itemId/likes", likeItem);
