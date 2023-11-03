@@ -21,13 +21,6 @@ mongoose
 
 app.use(express.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: "6530a12d11503c43beaeedd7",
-  };
-  next();
-});
-
 app.use(helmet());
 
 app.use(cors());

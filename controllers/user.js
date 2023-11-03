@@ -15,6 +15,7 @@ const createUser = (req, res) => {
         res.status(200).send({ userData });
       })
       .catch((err) => {
+        console.error(err);
         handleError(req, res, err);
       }),
   );
@@ -28,6 +29,7 @@ const getCurrentUser = (req, res) => {
       res.status(200).send({ user });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -38,6 +40,7 @@ const getUsers = (req, res) => {
       res.status(200).send(users);
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -54,6 +57,7 @@ const updateCurrentUser = (req, res) => {
       res.status(200).send({ user });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -67,6 +71,7 @@ const logIn = (req, res) => {
       res.send({ token });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };

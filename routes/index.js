@@ -4,8 +4,8 @@ const clothingItem = require("./clothingItem");
 const { ERROR_404 } = require("../utils/errors");
 const { logIn, createUser } = require("../controllers/user");
 
-router.post("/signin", logIn);
-router.post("/signup", createUser);
+router.post("/signin/", logIn);
+router.post("/signup/", createUser);
 
 router.use("/items", clothingItem);
 router.use("/users", user);

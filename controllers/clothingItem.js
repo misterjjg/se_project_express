@@ -10,6 +10,7 @@ const createItem = (req, res) => {
       res.status(200).send({ item });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -20,6 +21,7 @@ const getItems = (req, res) => {
       res.status(200).send(items);
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -35,6 +37,7 @@ const likeItem = (req, res) => {
       res.status(200).send({ item });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -50,6 +53,7 @@ const dislikeItem = (req, res) => {
       res.status(200).send({ item });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };
@@ -68,6 +72,7 @@ const deleteItem = (req, res) => {
       });
     })
     .catch((err) => {
+      console.error(err);
       handleError(req, res, err);
     });
 };

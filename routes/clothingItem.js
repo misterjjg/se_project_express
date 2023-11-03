@@ -12,16 +12,14 @@ const {
 // Read
 router.get("/", getItems);
 
-router.use(auth);
-
 // Create
-router.post("/", createItem);
+router.post("/", auth, createItem);
 
 // Update
-router.put("/:itemId/likes", likeItem);
+router.put("/:itemId/likes", auth, likeItem);
 
 // Delete
-router.delete("/:itemId", deleteItem);
-router.delete("/:itemId/likes", dislikeItem);
+router.delete("/:itemId", auth, deleteItem);
+router.delete("/:itemId/likes", auth, dislikeItem);
 
 module.exports = router;

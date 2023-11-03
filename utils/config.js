@@ -7,20 +7,20 @@ const {
   ERROR_500,
 } = require("./errors");
 
-const handleError = (req, res, error) => {
-  console.error(error);
-  if (error.code === 11000) {
+const handleError = (req, res, err) => {
+  console.error(err);
+  if (err.code === 11000) {
     res
       .status(ERROR_409)
       .send({ message: "A user with that email already exists" });
-  } else if (error.message === "Authentication Failed") {
+  } else if (err.message === "Authentication Failed") {
     res.status(ERROR_401).send({ message: "Invalid email or password" });
-  } else if (error.message === "Cannot delete another user's item") {
+  } else if (err.message === "Cannot delete another user's item") {
     res
       .status(ERROR_403)
       .send({ message: "Cannot delete another user's item" });
   } else {
-    switch (error.name) {
+    switch (err.name) {
       case "ValidationError":
         res.status(ERROR_400).send({ message: "Validation failed" });
         break;
