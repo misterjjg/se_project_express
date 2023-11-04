@@ -3,7 +3,7 @@ const handleError = require("../utils/config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/constants");
-const { ERROR_400 } = require("../utils/errors");
+const { ERROR_400, ERROR_404 } = require("../utils/errors");
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -50,7 +50,12 @@ const updateCurrentUser = (req, res) => {
   )
     .orFail()
     .then((user) => {
-      res.send({ user });
+      if (!user) {
+        return res
+          .status(ERROR_404)
+          .send({ message: "Requested Resource Not Found" });
+      }
+      return res.send({ user });
     })
     .catch((err) => {
       console.error(err);
@@ -63,7 +68,14 @@ const updateCurrentUser = (req, res) => {
 };
 
 const logIn = (req, res) => {
-  User.findUserByCredentials(req.body.email, req.body.password)
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(ERROR_400)
+      .send({ message: "Email and password are required." });
+  }
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
