@@ -60,18 +60,39 @@ const dislikeItem = (req, res) => {
     });
 };
 
+// const deleteItem = (req, res) => {
+//   const { itemId } = req.params;
+
+//   return ClothingItem.findById(itemId)
+//     .orFail()
+//     .then((item) => {
+//       if (String(item.owner) !== req.user._id) {
+//         return res
+//           .status(ERROR_403)
+//           .send({ message: "You are not authorized to delete this item" });
+//       }
+//       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
+//     })
+//     .catch((err) => {
+//       console.error(err);
+//       handleError(req, res, err);
+//     });
+// };
+
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  return ClothingItem.findById(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res
-          .status(ERROR_403)
-          .send({ message: "You are not authorized to delete this item" });
+        throw Error("Cannot delete another user's item");
       }
-      return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
+      ClothingItem.findByIdAndDelete(item._id)
+        .orFail()
+        .then(() => {
+          res.status(200).send({ message: "Item deleted" });
+        });
     })
     .catch((err) => {
       console.error(err);
