@@ -42,12 +42,10 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateCurrentUser = (req, res) => {
-  const { name, avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { name, avatar },
-    { new: true, runValidators: true },
-  )
+  User.findByIdAndUpdate(req.user._id, req.body, {
+    new: true,
+    runValidators: true,
+  })
     .orFail()
     .then((user) => {
       if (!user) {
