@@ -3,6 +3,7 @@ const handleError = require("../utils/config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/constants");
+const { ERROR_400 } = require("../utils/errors");
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -12,11 +13,17 @@ const createUser = (req, res) => {
       .then((user) => {
         const userData = user.toObject();
         delete userData.password;
-        res.status(200).send({ userData });
+        res.send({ userData });
       })
       .catch((err) => {
         console.error(err);
-        handleError(req, res, err);
+        if (err.message === "Incorrect email or password") {
+          res
+            .status(ERROR_400)
+            .send({ message: "Incorrect email or password" });
+        } else {
+          handleError(req, res, err);
+        }
       }),
   );
 };
@@ -26,18 +33,7 @@ const getCurrentUser = (req, res) => {
   User.findById(userId)
     .orFail()
     .then((user) => {
-      res.status(200).send({ user });
-    })
-    .catch((err) => {
-      console.error(err);
-      handleError(req, res, err);
-    });
-};
-
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => {
-      res.status(200).send(users);
+      res.send({ user });
     })
     .catch((err) => {
       console.error(err);
@@ -54,11 +50,15 @@ const updateCurrentUser = (req, res) => {
   )
     .orFail()
     .then((user) => {
-      res.status(200).send({ user });
+      res.send({ user });
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.message === "Incorrect email or password") {
+        res.status(ERROR_400).send({ message: "Incorrect email or password" });
+      } else {
+        handleError(req, res, err);
+      }
     });
 };
 
@@ -72,13 +72,16 @@ const logIn = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.message === "Incorrect email or password") {
+        res.status(ERROR_400).send({ message: "Incorrect email or password" });
+      } else {
+        handleError(req, res, err);
+      }
     });
 };
 
 module.exports = {
   createUser,
-  getUsers,
   getCurrentUser,
   logIn,
   updateCurrentUser,
