@@ -3,7 +3,7 @@ const handleError = require("../utils/config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../utils/constants");
-const { ERROR_400, ERROR_404 } = require("../utils/errors");
+const { ERROR_400, ERROR_404, ERROR_401 } = require("../utils/errors");
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -17,13 +17,7 @@ const createUser = (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        if (err.message === "Incorrect email or password") {
-          res
-            .status(ERROR_400)
-            .send({ message: "Incorrect email or password" });
-        } else {
-          handleError(req, res, err);
-        }
+        handleError(req, res, err);
       }),
   );
 };
@@ -42,10 +36,14 @@ const getCurrentUser = (req, res) => {
 };
 
 const updateCurrentUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, {
-    new: true,
-    runValidators: true,
-  })
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name, avatar: req.body.avatar },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .orFail()
     .then((user) => {
       if (!user) {
@@ -57,11 +55,7 @@ const updateCurrentUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      if (err.message === "Incorrect email or password") {
-        res.status(ERROR_400).send({ message: "Incorrect email or password" });
-      } else {
-        handleError(req, res, err);
-      }
+      handleError(req, res, err);
     });
 };
 
@@ -83,7 +77,7 @@ const logIn = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        res.status(ERROR_400).send({ message: "Incorrect email or password" });
+        res.status(ERROR_401).send({ message: "Incorrect email or password" });
       } else {
         handleError(req, res, err);
       }
