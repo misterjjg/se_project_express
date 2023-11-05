@@ -1,7 +1,9 @@
-const User = require("../models/user");
-const handleError = require("../utils/config");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+
+const User = require("../models/user");
+const handleError = require("../utils/config");
+
 const { JWT_SECRET } = require("../utils/constants");
 const { ERROR_400, ERROR_404, ERROR_401 } = require("../utils/errors");
 
