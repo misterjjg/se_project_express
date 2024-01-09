@@ -2,10 +2,10 @@ const ClothingItem = require("../models/clothingItem");
 const handleError = require("../utils/config");
 
 const createItem = (req, res) => {
-  const { name, weather, imageUrl } = req.body;
+  const { name, weather, imageUrl, likes } = req.body;
   const userId = req.user._id;
 
-  ClothingItem.create({ name, weather, imageUrl, owner: userId })
+  ClothingItem.create({ name, weather, imageUrl, owner: userId, likes })
     .then((item) => {
       res.status(200).send({ item });
     })
