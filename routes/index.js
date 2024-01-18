@@ -2,9 +2,9 @@ const router = require("express").Router();
 const user = require("./user");
 const clothingItem = require("./clothingItem");
 const { ERROR_404 } = require("../utils/errors");
-const { logIn, createUser } = require("../controllers/user");
+const { loginUser, createUser } = require("../controllers/user");
 
-router.post("/signin/", logIn);
+router.post("/signin/", loginUser);
 router.post("/signup/", createUser);
 
 router.use("/items", clothingItem);

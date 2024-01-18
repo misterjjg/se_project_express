@@ -61,7 +61,7 @@ const updateCurrentUser = (req, res) => {
     });
 };
 
-const logIn = (req, res) => {
+const loginUser = (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -89,6 +89,6 @@ const logIn = (req, res) => {
 module.exports = {
   createUser,
   getCurrentUser,
-  logIn,
+  loginUser,
   updateCurrentUser,
 };

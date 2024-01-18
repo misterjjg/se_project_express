@@ -9,6 +9,8 @@ const helmet = require("helmet");
 
 const routes = require("./routes");
 
+const { errors } = require("celebrate");
+
 const errorHandler = require("./middlewares/errorHandler");
 
 const { PORT = 3001 } = process.env;
@@ -28,6 +30,8 @@ app.use(helmet());
 app.use(cors());
 
 app.use(routes);
+
+app.use(errors());
 
 app.use(errorHandler);
 
