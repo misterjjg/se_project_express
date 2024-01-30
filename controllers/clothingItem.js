@@ -1,5 +1,7 @@
 const ClothingItem = require("../models/clothingItem");
-const handleError = require("../utils/config");
+const ForbiddenError = require("../utils/errors/forbidden-error");
+const BadRequestError = require("../utils/errors/bad-request-error");
+const DocumentNotFoundError = require("../utils/errors/not-found-error");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl, likes } = req.body;
@@ -11,7 +13,11 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "ValidationError") {
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -22,7 +28,7 @@ const getItems = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      next(err);
     });
 };
 
@@ -38,7 +44,17 @@ const likeItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "DocumentNotFoundError") {
+        next(
+          new DocumentNotFoundError(
+            "There is no clothing item with the requested id, or the request was sent to a non-existent address",
+          ),
+        );
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID passed."));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -54,7 +70,17 @@ const dislikeItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "DocumentNotFoundError") {
+        next(
+          new DocumentNotFoundError(
+            "There is no clothing item with the requested id, or the request was sent to a non-existent address",
+          ),
+        );
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID passed."));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -65,17 +91,25 @@ const deleteItem = (req, res) => {
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        throw Error("Cannot delete another user's item");
+        throw new ForbiddenError("You are not authorized to delete this item.");
       }
-      ClothingItem.findByIdAndDelete(item._id)
-        .orFail()
-        .then(() => {
-          res.status(200).send({ message: "Item deleted" });
-        });
+      return item
+        .deleteOne()
+        .then(() => res.send({ message: "Item deleted." }));
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID passed"));
+      } else if (err.name === "DocumentNotFoundError") {
+        next(
+          new DocumentNotFoundError(
+            "There is no clothing item with the requested id, or the request was sent to a non-existent address",
+          ),
+        );
+      } else {
+        next(err);
+      }
     });
 };
 
