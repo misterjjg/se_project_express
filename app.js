@@ -7,9 +7,9 @@ require("dotenv").config();
 
 const helmet = require("helmet");
 
-const routes = require("./routes");
-
 const { errors } = require("celebrate");
+
+const routes = require("./routes");
 
 const errorHandler = require("./middlewares/errorHandler");
 
