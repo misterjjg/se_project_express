@@ -12,7 +12,7 @@ const DuplicateError = require("../utils/errors/duplicate-error");
 const UnauthorizedError = require("../utils/errors/unauthorized-error");
 const NotFoundError = require("../utils/errors/not-found-error");
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   bcrypt.hash(password, 10).then((hash) =>
@@ -35,7 +35,7 @@ const createUser = (req, res) => {
   );
 };
 
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   User.findById(userId)
     .orFail()
@@ -58,7 +58,7 @@ const getCurrentUser = (req, res) => {
     });
 };
 
-const updateCurrentUser = (req, res) => {
+const updateCurrentUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, avatar: req.body.avatar },
@@ -89,7 +89,7 @@ const updateCurrentUser = (req, res) => {
     });
 };
 
-const loginUser = (req, res) => {
+const loginUser = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)

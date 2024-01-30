@@ -16,7 +16,7 @@ router.use("/users", user);
 //   res.status(ERROR_404).send({ message: "Requested resource not found" });
 // });
 
-router.use((req, res) => {
+router.use((req, res, next) => {
   console.log(res);
   return next(
     new NotFoundError("The request was sent to a non-existent address"),

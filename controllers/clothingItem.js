@@ -3,7 +3,7 @@ const ForbiddenError = require("../utils/errors/forbidden-error");
 const BadRequestError = require("../utils/errors/bad-request-error");
 const DocumentNotFoundError = require("../utils/errors/not-found-error");
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   const { name, weather, imageUrl, likes } = req.body;
   const userId = req.user._id;
 
@@ -21,7 +21,7 @@ const createItem = (req, res) => {
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => {
       res.status(200).send(items);
@@ -32,7 +32,7 @@ const getItems = (req, res) => {
     });
 };
 
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $addToSet: { likes: req.user._id } },
@@ -58,7 +58,7 @@ const likeItem = (req, res) => {
     });
 };
 
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   ClothingItem.findByIdAndUpdate(
     req.params.itemId,
     { $pull: { likes: req.user._id } },
@@ -84,7 +84,7 @@ const dislikeItem = (req, res) => {
     });
 };
 
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   const { itemId } = req.params;
 
   ClothingItem.findById(itemId)
