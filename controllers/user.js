@@ -2,10 +2,15 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const handleError = require("../utils/config");
+// const handleError = require("../utils/config");
 
 const { JWT_SECRET } = require("../utils/constants");
-const { ERROR_400, ERROR_404, ERROR_401 } = require("../utils/errors");
+// const { ERROR_400, ERROR_404, ERROR_401 } = require("../utils/errors");
+
+const BadRequestError = require("../utils/errors/bad-request-error");
+const DuplicateError = require("../utils/errors/duplicate-error");
+const UnauthorizedError = require("../utils/errors/unauthorized-error");
+const NotFoundError = require("../utils/errors/not-found-error");
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -19,7 +24,13 @@ const createUser = (req, res) => {
       })
       .catch((err) => {
         console.error(err);
-        handleError(req, res, err);
+        if (err.name === "ValidationError") {
+          next(new BadRequestError(err.message));
+        } else if (err.code === 11000) {
+          next(new DuplicateError("Email already exists in our system."));
+        } else {
+          next(err);
+        }
       }),
   );
 };
@@ -33,7 +44,17 @@ const getCurrentUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "DocumentNotFoundError") {
+        next(
+          new NotFoundError(
+            "There is no user with the requested id, or the request was sent to a non-existent address",
+          ),
+        );
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID passed."));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -48,27 +69,29 @@ const updateCurrentUser = (req, res) => {
   )
     .orFail()
     .then((user) => {
-      if (!user) {
-        return res
-          .status(ERROR_404)
-          .send({ message: "Requested Resource Not Found" });
-      }
-      return res.send({ user });
+      res.send({ data: user });
     })
     .catch((err) => {
       console.error(err);
-      handleError(req, res, err);
+      if (err.name === "DocumentNotFoundError") {
+        next(
+          new NotFoundError(
+            "There is no user with the requested id, or the request was sent to a non-existent address",
+          ),
+        );
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("Invalid ID passed."));
+      } else if (err.name === "ValidationError") {
+        next(new BadRequestError("You must enter a valid URL."));
+      } else {
+        next(err);
+      }
     });
 };
 
 const loginUser = (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res
-      .status(ERROR_400)
-      .send({ message: "Email and password are required." });
-  }
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -79,9 +102,9 @@ const loginUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
-        res.status(ERROR_401).send({ message: "Incorrect email or password" });
+        next(new UnauthorizedError("Incorrect email address or password."));
       } else {
-        handleError(req, res, err);
+        next(err);
       }
     });
 };
